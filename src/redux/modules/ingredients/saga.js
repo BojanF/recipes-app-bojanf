@@ -18,7 +18,7 @@ export function* asyncGetIngredients({ payload, resolve, reject }) {
         const response = {
             result: 'ok'
         }
-        if (response.result === 'ok') { 
+        if (response.result === 'ok') {
             yield put(ingredientsActionCreators.getIngredientsSuccess({}));
             resolve('SUCCESS FROM SAGA');
         } else {
@@ -26,10 +26,32 @@ export function* asyncGetIngredients({ payload, resolve, reject }) {
         }
 
     } catch (e) {
-      console.log(e);
-      reject(e);
+        console.log(e);
+        reject(e);
     }
-  }
+}
+
+export function* asyncAddIngredient({ payload, resolve, reject }) {
+    
+    const { newIngredient } = payload;
+    console.log('FROM SAGA: ', newIngredient);
+    try {
+        // Here should be http call to the server
+        const response = {
+            result: 'ok'
+        }
+        if (response.result === 'ok') {
+            yield put(ingredientsActionCreators.addIngredientSuccess({newIngredient}));
+            resolve('SUCCESS FROM SAGA ADD INGREDIENT');
+        } else {
+            reject("ERROR")
+        }
+
+    } catch (e) {
+        console.log(e);
+        reject(e);
+    }
+}
 
 export function* watchGetIngredients() {
     while (true) {
@@ -38,8 +60,16 @@ export function* watchGetIngredients() {
     }
 }
 
+export function* watchAddIngredient() {
+    while (true) {
+        const action = yield take(ADD_INGREDIENT);
+        yield* asyncAddIngredient(action)
+    }
+}
+
 export default function* () {
     yield all([
-        fork(watchGetIngredients)
+        fork(watchGetIngredients),
+        fork(watchAddIngredient)
     ]);
 }
